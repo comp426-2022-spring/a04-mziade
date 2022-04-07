@@ -7,6 +7,13 @@ args['port', 'debug', 'log', 'help']
 const port = args.port || process.env.PORT || 5000
 const debug = args.debug || process.env.debug || 'false'
 const log = args.log || process.env.log || 'true'
+if(log == 'false'){
+// Use morgan for logging to files
+// Create a write stream to append (flags: 'a') to a file
+const WRITESTREAM = fs.createWriteStream('accesslog', { flags: 'a' })
+// Set up the access logging middleware
+app.use(morgan('combined', { stream: WRITESTREAM }))
+}
 const help = (`
 server.js [options]
 
