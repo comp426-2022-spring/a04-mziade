@@ -2,7 +2,6 @@
 const express = require('express')
 const app = express()
 const fs = require('fs')
-const db = require('./database.js')
 const args = require('minimist')(process.argv.slice(2))
 // --port	Set the port number for the server to listen on. Must be an integer between 1 and 65535.
 args['port', 'debug', 'log', 'help']
@@ -43,7 +42,7 @@ if (args.help || args.h) {
 const server = app.listen(port, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%',port))
 });
-
+const db = require('./database.js')
 app.get('/app/', (req, res) => {
     // Respond with status 200
 	res.statusCode = 200;
@@ -72,20 +71,21 @@ app.use("/app/new/user", (req, res, next) => {
 	next()
 })
 
-app.get("/app/log/access", (req, res) => {	
-    try {
-        const stmt = db.prepare('SELECT * FROM accesslog').all()
-        res.status(200).json(stmt)
-    } catch {
-        console.error(e)
+if(debug == true){
+    app.get("/app/log/access", (req, res) => {	
+        try {
+            const stmt = db.prepare('SELECT * FROM accesslog').all()
+            res.status(200).json(stmt)
+        } catch {
+            console.error(e)
+        }
     }
-});
+    )
 
-app.use("/app/error", (req, res) => {
-	console.log("Error test successful")
-})
-
-
+    app.use("/app/error", (req, res) => {
+        console.log("Error test successful")
+    })
+}
 
 
 // Default response for any other request
