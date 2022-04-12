@@ -9,6 +9,8 @@ args['port', 'debug', 'log', 'help']
 const port = args.port || process.env.PORT || 5000
 const debug = args.debug || process.env.debug || 'false'
 const log = args.log || process.env.log || 'true'
+const db = require('./database.js')
+
 if(log == 'false'){
 // Use morgan for logging to files
 // Create a write stream to append (flags: 'a') to a file
@@ -42,7 +44,7 @@ if (args.help || args.h) {
 const server = app.listen(port, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%',port))
 });
-const db = require('./database.js')
+
 app.get('/app/', (req, res) => {
     // Respond with status 200
 	res.statusCode = 200;
@@ -52,7 +54,8 @@ app.get('/app/', (req, res) => {
 		res.end(res.statusCode+ ' ' +res.statusMessage)
 });
 
-app.use("/app/new/user", (req, res, next) => {
+
+app.use("/app/add/user", (req, res, next) => {
 	let logdata = {
         remoteaddr: req.ip,
         remoteuser: req.user,
@@ -71,7 +74,10 @@ app.use("/app/new/user", (req, res, next) => {
 	next()
 })
 
-if(debug == true){
+if(debug == 'true'){
+    app.get("/app/error", (req, res) => {
+        throw new Error("Error Test Successful")
+    })
     app.get("/app/log/access", (req, res) => {	
         try {
             const stmt = db.prepare('SELECT * FROM accesslog').all()
@@ -79,17 +85,9 @@ if(debug == true){
         } catch {
             console.error(e)
         }
-    }
-    )
+    } )
 
-    app.use("/app/error", (req, res) => {
-        console.log("Error test successful")
-    })
 }
 
 
-// Default response for any other request
-app.use(function(req, res){
-    res.status(404).send('404 NOT FOUND')
-});
 
