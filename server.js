@@ -76,7 +76,16 @@ app.use("/app/add/user", (req, res, next) => {
 
 if(debug == 'true'){
     app.get("/app/error", (req, res) => {
-        throw new Error("Error test successful.")
+        try {
+            throw new Error("Error test successful.")
+          } catch (error) {
+            res.status(error.status || 500).send({
+              error: {
+                status: error.status || 500,
+                message: error.message || "Internal Server Error",
+              },
+            });
+          }
     })
     app.get("/app/log/access", (req, res) => {	
         try {
