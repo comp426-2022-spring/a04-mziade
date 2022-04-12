@@ -38,7 +38,6 @@ if (args.help || args.h) {
     process.exit(0)
 }
 
-
 // Start an app server
 const server = app.listen(port, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%',port))
