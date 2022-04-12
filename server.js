@@ -73,8 +73,8 @@ const myFunc = function(req, res, next) {
 
 
 if(debug == 'true'){
-    app.get("/app/error", myFunc, (req, res) => {
-        throw new Error("Error test successful.")
+    app.get("/app/error", (req, res) => {
+        res.status(500).send('Error test successful.')
     })
     app.get("/app/log/access", myFunc, (req, res) => {	
             const stmt = db.prepare('SELECT * FROM accesslog').all()
