@@ -64,26 +64,22 @@ const myFunc = function(req, res, next) {
         status: res.statusCode,
         referer: req.headers['referer'],
         useragent: req.headers['user-agent']
-    }
+    };
     const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
     res.status(200).json(info)
-	next()
-}
+    response.end();
+};
 
-app.use(myFunc)
 
 if(debug == 'true'){
-    app.get("/app/error", (req, res) => {
+    app.get("/app/error", myFunc, (req, res) => {
         throw new Error("Error test successful.")
     })
-    app.get("/app/log/access", (req, res) => {	
-        try {
+    app.get("/app/log/access", myFunc, (req, res) => {	
             const stmt = db.prepare('SELECT * FROM accesslog').all()
+            console.log(stmt)
             res.status(200).json(stmt)
-        } catch {
-            console.error(e)
-        }
     } )
 
 }
