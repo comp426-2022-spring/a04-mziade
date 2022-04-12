@@ -76,7 +76,7 @@ app.use("/app/add/user", (req, res, next) => {
 
 if(debug == 'true'){
     app.get("/app/error", (req, res) => {
-        throw new Error("Error Test Successful")
+        throw new Error("Error test successful.")
     })
     app.get("/app/log/access", (req, res) => {	
         try {
