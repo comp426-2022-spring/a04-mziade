@@ -76,17 +76,9 @@ app.use("/app/add/user", (req, res, next) => {
 
 if(debug == 'true'){
     app.get("/app/error", (req, res) => {
-        try {
-            throw new Error("Error test successful.")
-          } catch (error) {
-            res.status(error.status || 500).send({
-              error: {
-                status: error.status || 500,
-                message: error.message || "Internal Server Error",
-              },
-            });
-          }
+        throw new Error("Error test successful.")
     })
+    
     app.get("/app/log/access", (req, res) => {	
         try {
             const stmt = db.prepare('SELECT * FROM accesslog').all()
