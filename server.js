@@ -1,8 +1,10 @@
 // Require Express.js
-const express = require('express')
-const app = express()
+var express = require('express')
+var app = express()
 const fs = require('fs')
 const morgan = require('morgan');
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 const args = require('minimist')(process.argv.slice(2))
 // --port	Set the port number for the server to listen on. Must be an integer between 1 and 65535.
 args['port', 'debug', 'log', 'help']
@@ -10,7 +12,6 @@ const port = args.port || process.env.PORT || 5000
 const debug = args.debug || process.env.debug || 'false'
 const log = args.log || process.env.log || 'true'
 const db = require('./database.js')
-
 if(log == 'false'){
 // Use morgan for logging to files
 // Create a write stream to append (flags: 'a') to a file
@@ -45,17 +46,13 @@ const server = app.listen(port, () => {
     console.log('App listening on port %PORT%'.replace('%PORT%',port))
 });
 
-app.get('/app/', (req, res) => {
-    // Respond with status 200
-	res.statusCode = 200;
-	// Respond with status message "OK"
-		res.statusMessage = 'OK';
-		res.writeHead( res.statusCode, { 'Content-Type' : 'text/plain' });
-		res.end(res.statusCode+ ' ' +res.statusMessage)
+app.get("/app/", (req, res, next) => {
+    res.json({"message":"Your API works! (200)"});
+	res.status(200);
 });
 
-
-app.use("/app/add/user", (req, res, next) => {
+// Middleware
+const myFunc = function(req, res, next) {
 	let logdata = {
         remoteaddr: req.ip,
         remoteuser: req.user,
@@ -72,13 +69,14 @@ app.use("/app/add/user", (req, res, next) => {
     const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
     res.status(200).json(info)
 	next()
-})
+}
+
+app.use(myFunc)
 
 if(debug == 'true'){
     app.get("/app/error", (req, res) => {
         throw new Error("Error test successful.")
     })
-    
     app.get("/app/log/access", (req, res) => {	
         try {
             const stmt = db.prepare('SELECT * FROM accesslog').all()
@@ -89,6 +87,5 @@ if(debug == 'true'){
     } )
 
 }
-
 
 
