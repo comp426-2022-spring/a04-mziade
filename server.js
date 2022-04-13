@@ -54,7 +54,6 @@ app.get("/app/", (req, res, next) => {
 // Middleware
 const myFunc = function(req, res, next) {
 	let logdata = {
-        id: req.id,
         remoteaddr: req.ip,
         remoteuser: req.user,
         time: Date.now(),
@@ -66,8 +65,8 @@ const myFunc = function(req, res, next) {
         referer: req.headers['referer'],
         useragent: req.headers['user-agent']
     };
-    const stmt = db.prepare('INSERT INTO accesslog (id, remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    const info = stmt.run(logdata.id, logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
+    const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
     next()
     // res.status(200).json(info)
 };
