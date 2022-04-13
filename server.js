@@ -72,9 +72,9 @@ const myFunc = function(req, res, next) {
 };
 
 
-if(debug == 'true'){
+if(debug == true){
     app.get("/app/error", (req, res) => {
-        res.status(500).send('500 Internal Server Error')
+        throw new Error("Error test succesful.")
     })
     app.get("/app/log/access", myFunc, (req, res) => {	
             const stmt = db.prepare('SELECT * FROM accesslog').all()
